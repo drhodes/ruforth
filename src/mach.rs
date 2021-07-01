@@ -41,7 +41,7 @@ pub fn main_loop(mut mach: Mach) {
     }
 }
 
-pub fn getWord(mut mach: Mach, prompt: &'static str) -> (Mach, Option<String>) {
+pub fn getWord(mach: &mut Mach, prompt: &'static str) -> Option<String> {
     let mut lin = String::new();
     while !(mach.words.len() > 0) {
         if mach.initCode.len() > 0 {
@@ -59,15 +59,15 @@ pub fn getWord(mut mach: Mach, prompt: &'static str) -> (Mach, Option<String>) {
     }
     let mut word = &mach.words[0];
     match word.as_str() {
-        "bye" => return (mach, None),
+        "bye" => return None,
         "@ds" => {
             // println!("{:?}", mach.ds);
             let word = mach.words.remove(0);
-            return (mach, Some(word));
+            return Some(word);
         }
         _ => {
             let word = mach.words.remove(0);
-            return (mach, Some(word));
+            return Some(word);
         }
     }
 }
@@ -78,14 +78,11 @@ pub fn compile(mut mach: Mach) -> (Mach, Option<Vec<PCode>>) {
     let mut prompt = "Forth> ";
 
     loop {
-        match getWord(mach, prompt) {
-            (m, None) => {
-                mach = m;
+        match getWord(&mut mach, prompt) {
+            None => {
                 return (mach, None);
             }
-            (m, Some(word)) => {
-                // println!("compile.getWord -> {:?}", word);
-                mach = m;
+            Some(word) => {
                 if let Some(rAct) = mach.rDict.get(&word) {
                     // println!("compile.rDict[{:?}] -> func ", word);
                     match rAct {
@@ -232,7 +229,7 @@ pub fn cColon(mut mach: Mach) -> Mach {
     if !mach.cStack.len() == 0 {
         panic!(": inside Control stack");
     }
-    let (mut mach, label) = getWord(mach, "...");
+    let label = getWord(&mut mach, "...");
     mach.cStack.push(("COLON".to_owned(), label.unwrap()));
     return mach;
 }
