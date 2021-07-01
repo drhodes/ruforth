@@ -41,7 +41,7 @@ impl fmt::Debug for PCode {
     }
 }
 
-pub type Func = fn(Mach, &Vec<PCode>, usize) -> (Mach, Option<usize>);
+pub type Func = fn(&mut Mach, &Vec<PCode>, usize) -> Option<usize>;
 
 #[derive(Clone)]
 pub struct Mach {

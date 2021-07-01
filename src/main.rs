@@ -38,6 +38,6 @@ fn main() {
         None => {}
     }
 
-    crate::mach::main_loop(m.clone());
+    crate::mach::main_loop(&mut m);
     println!("{:?}", "done");
 }

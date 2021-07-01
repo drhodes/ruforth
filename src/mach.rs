@@ -30,12 +30,12 @@ impl Mach {
     }
 }
 
-pub fn main_loop(mut mach: Mach) {
+pub fn main_loop(mach: &mut Mach) {
     loop {
-        let mut pcode = compile(&mut mach);
+        let mut pcode = compile(mach);
         match pcode {
             None => return,
-            Some(code) => mach = execute(mach, code),
+            Some(code) => execute(mach, code),
         }
     }
 }
@@ -113,7 +113,7 @@ pub fn compile(mach: &mut Mach) -> Option<Vec<PCode>> {
     } // end loop
 }
 
-pub fn execute(mut mach: Mach, code: Vec<PCode>) -> Mach {
+pub fn execute(mach: &mut Mach, code: Vec<PCode>) {
     // println!("EXECUTING  {:?} ------------------", code);
     // println!("Data Stack {:?} -----------", mach.ds);
 
@@ -124,15 +124,14 @@ pub fn execute(mut mach: Mach, code: Vec<PCode>) -> Mach {
             PCode::PList(_) => todo!(),
             PCode::PFunc(func) => {
                 p += 1;
-                let (m, newP) = func(mach, &code, p);
-                mach = m;
+                let newP = func(mach, &code, p);
                 if let Some(q) = newP {
                     p = q;
                 }
             }
             PCode::PRFunc(func) => {
                 p += 1;
-                let data = func(&mut mach);
+                let data = func(mach);
                 if let Some(Int(newP)) = data {
                     p = newP as usize;
                 }
@@ -144,7 +143,6 @@ pub fn execute(mut mach: Mach, code: Vec<PCode>) -> Mach {
             }
         }
     }
-    return mach;
 }
 
 fn rAdd(m: &mut Mach) -> Option<Data> {
@@ -206,22 +204,21 @@ pub fn tokenize_words(mut s: String) -> Vec<String> {
     return words;
 }
 
-pub fn rRun(mut mach: Mach, pcode: &Vec<PCode>, p: usize) -> (Mach, Option<usize>) {
+pub fn rRun(mach: &mut Mach, pcode: &Vec<PCode>, p: usize) -> Option<usize> {
     match &pcode[p] {
         PCode::PWord(w) => {
             let f = mach.rDict.get(w).unwrap().clone();
-            let m = execute(mach, vec![f]);
-            mach = m;
+            execute(mach, vec![f]);
         }
         _ => panic!("OH NO!"),
     }
-    return (mach, Some(p + 1));
+    return Some(p + 1);
 }
 
-pub fn rPush(mut mach: Mach, pcode: &Vec<PCode>, p: usize) -> (Mach, Option<usize>) {
+pub fn rPush(mach: &mut Mach, pcode: &Vec<PCode>, p: usize) -> Option<usize> {
     let temp = pcode[p].clone();
     mach.ds.push(temp);
-    return (mach, Some(p + 1));
+    return Some(p + 1);
 }
 
 pub fn cColon(mut mach: Mach) -> Mach {
