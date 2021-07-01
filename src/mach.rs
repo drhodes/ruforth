@@ -32,8 +32,7 @@ impl Mach {
 
 pub fn main_loop(mut mach: Mach) {
     loop {
-        let (m, mut pcode) = compile(mach);
-        mach = m;
+        let mut pcode = compile(&mut mach);
         match pcode {
             None => return,
             Some(code) => mach = execute(mach, code),
@@ -72,15 +71,15 @@ pub fn getWord(mach: &mut Mach, prompt: &'static str) -> Option<String> {
     }
 }
 
-pub fn compile(mut mach: Mach) -> (Mach, Option<Vec<PCode>>) {
+pub fn compile(mach: &mut Mach) -> Option<Vec<PCode>> {
     // println!("COMPILE -------------------------------------------------------");
     let mut pcode: Vec<PCode> = vec![];
     let mut prompt = "Forth> ";
 
     loop {
-        match getWord(&mut mach, prompt) {
+        match getWord(mach, prompt) {
             None => {
-                return (mach, None);
+                return None;
             }
             Some(word) => {
                 if let Some(rAct) = mach.rDict.get(&word) {
@@ -110,7 +109,7 @@ pub fn compile(mut mach: Mach) -> (Mach, Option<Vec<PCode>>) {
                 }
             }
         }
-        return (mach, Some(pcode));
+        return Some(pcode);
     } // end loop
 }
 
