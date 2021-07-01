@@ -1,0 +1,10 @@
+This is a derived work, based on the following forth implementation:
+http://www.openbookproject.net/py4fun/forth/forth.html
+Copyright © 2015-2021 Chris Meyers and Fred Obermann
+
+Ported to rust by Derek A. Rhodes, Copyright © 2021
+https://www.gnu.org/licenses/copyleft.html
+
+A specific GNU license is not specified, the authors email addresses
+have link rotted.
+
